@@ -1,0 +1,21 @@
+<form method="POST" enctype="multipart/form-data"> 
+    {% csrf_token %} 
+    {{ form.as_p }} 
+    <input type="submit" value="Submit"> 
+</form>
+{% if data %}
+<table>
+  <tr>
+    <th>Слово</th>
+    <th>tf</th>
+    <th>idf</th>
+  </tr>
+  {% for doc_term in data %}
+    <tr>
+      <td>{{ doc_term.word.spelling }}</td>
+      <td>{{ doc_term.frequency|floatformat:4 }}</td>
+      <td>{{ doc_term.word.inverse_frequency|floatformat:4 }}</td>
+    </tr>
+  {% endfor %}
+</table>
+{% endif %}
