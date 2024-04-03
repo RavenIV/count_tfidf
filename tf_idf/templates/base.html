@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      TF-IDF
+    </title>
+    {% load django_bootstrap5 %}
+    {% bootstrap_css %}
+  </head>
+  <body>
+    <main>
+      <div class="bg-dark" style="padding: 20px;">
+        <div class="px-4 py-5 my-5 text-center">
+          <h1 style="color: aliceblue">Рассчитать TF-IDF</h1>
+        </div>
+      </div>
+      <div class="container py-5">
+        {% block content%}{% endblock %}
+      </div>
+    </main>
+    <footer class="border-top text-center py-3">
+      <p>
+        Разработано <a href="https://github.com/RavenIV/">RavenIV</a>
+      </p>
+    </footer>
+  </body>
+</html>

@@ -1,21 +1,62 @@
-<form method="POST" enctype="multipart/form-data"> 
-    {% csrf_token %} 
-    {{ form.as_p }} 
-    <input type="submit" value="Submit"> 
-</form>
-{% if data %}
-<table>
-  <tr>
-    <th>Слово</th>
-    <th>tf</th>
-    <th>idf</th>
-  </tr>
-  {% for doc_term in data %}
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% block content %}
+  
+  <div class="px-3 py-3 my-3">
+    <p>
+      <b class="term">TF-IDF</b> 
+      (от англ. TF — <em>term frequency</em>, IDF — <em>inverse document frequency</em>) — 
+      статистическая мера, используемая для оценки важности слова в контексте документа, 
+      являющегося частью коллекции документов или корпуса.</p>
+    <p>
+      <b class="term">TF</b> 
+      (<em>term frequency </em>— частота слова) — 
+      отношение числа вхождений некоторого слова к общему числу слов документа.</p>
+    <p>
+      <b class="term">IDF</b> 
+      (<em>inverse document frequency</em> — обратная частота документа) — инверсия частоты, 
+      с которой некоторое слово встречается в документах коллекции. </p>  
+  </div>
+  
+  <div class="card my-4">
+    <div class="card-header text-start">
+      Загрузить текстовый документ
+    </div>
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data"> 
+        {% csrf_token %}
+        <label for="formFile" class="form-label">Принимаются только файлы <b>.txt</b></label>
+        <div class="mb-3">
+          <input class="form-control" type="file" id="formFile" name="text_file" accept=".txt">
+        </div>
+        <div class="mb-3">
+          {% bootstrap_button button_type="submit" content="Сгенерировать таблицу" %}
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <table class="table table-striped">
     <tr>
-      <td>{{ doc_term.word.spelling }}</td>
-      <td>{{ doc_term.frequency|floatformat:4 }}</td>
-      <td>{{ doc_term.word.inverse_frequency|floatformat:4 }}</td>
+      <th>#</th>
+      <th>Слово</th>
+      <th>TF (частота слова)</th>
+      <th>IDF (обратная частота документа)</th>
     </tr>
-  {% endfor %}
-</table>
-{% endif %}
+    {% if data %}
+      {% for term in data %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          {% for value in term %}
+          <td>{{ value }}</td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    {% elif error %}
+      <div class="px-3 py-3 my-3">
+        <p class="text-danger">{{ error }}</p>
+      </div>
+    {% endif %}
+  </table>
+
+{% endblock %}

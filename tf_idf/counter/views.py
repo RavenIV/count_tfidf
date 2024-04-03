@@ -1,59 +1,26 @@
-from math import log
-from re import findall
-
-from django.core.files.uploadedfile import UploadedFile
 from django.shortcuts import render
 
-from .forms import UploadTextFile
-from .models import Document, Term
+from .models import Document
+from .utils import (
+    retrieve_words,
+    count_number_of_each_word,
+    set_document_terms,
+    count_tf_idf
+)
 
-
-def count_tf(frequency: float, words_number: float) -> float:
-    return frequency / words_number
-
-def count_idf(term: Term):
-    return log(Document.objects.count() / term.documents.count())
-
-
-def handle_uploaded_file(file: UploadedFile):
-    
-    text = str(file.read(), encoding='utf-8').lower()
-    words = findall(r'[^\W0-9]+', text)
-    document = Document.objects.create(
-        name=file.name,
-        number_of_words=len(words)
-    )
-    words_count = {}
-
-    for word in words:
-        if word not in words_count:
-            words_count[word] = 1
-        else:
-            words_count[word] += 1
-
-    for word, count in words_count.items():
-
-        term, created = Term.objects.get_or_create(spelling=word)
-        term.documents.add(
-            document,
-            through_defaults={
-                'frequency': count_tf(
-                    float(count), float(document.number_of_words)
-                ),
-            }
-        )
-        Term.objects.filter(id=term.pk).update(inverse_frequency=count_idf(term))
-
-    return document.documentterms_set.order_by('-word__inverse_frequency')[:50]
-
+WORDS_NOT_FOUND = 'Упс! В файле нет слов. Попробуйте загрузить другой файл.'
 
 
 def counter_view(request):
     context = {}
-    form = UploadTextFile(request.POST, request.FILES)
-    if form.is_valid():
-        data = handle_uploaded_file(request.FILES['file'])
-        context['data'] = data
-    context['form'] = form
+    if request.method == 'POST' and request.FILES['text_file']:
+        file = request.FILES['text_file']
+        words = retrieve_words(file)
+        if words:
+            document = Document.objects.create(name=file.name)
+            words_count = count_number_of_each_word(words)
+            set_document_terms(document, list(words_count.keys()))
+            context['data'] = count_tf_idf(document, len(words), words_count)
+        else:
+            context['error'] = WORDS_NOT_FOUND
     return render(request, 'counter.html', context)
-    
