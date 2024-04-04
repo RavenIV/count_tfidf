@@ -8,7 +8,7 @@ from .utils import (
     count_tf_idf
 )
 
-WORDS_NOT_FOUND = 'Упс! В файле нет слов. Попробуйте загрузить другой файл.'
+WORDS_NOT_FOUND = 'В файле нет слов. Попробуйте загрузить другой файл.'
 
 
 def counter_view(request):
@@ -20,7 +20,9 @@ def counter_view(request):
             document = Document.objects.create(name=file.name)
             words_count = count_number_of_each_word(words)
             set_document_terms(document, list(words_count.keys()))
-            context['data'] = count_tf_idf(document, len(words), words_count)
+            context['data'] = count_tf_idf(
+                document, len(words), words_count
+            )[:50]
         else:
             context['error'] = WORDS_NOT_FOUND
     return render(request, 'counter.html', context)

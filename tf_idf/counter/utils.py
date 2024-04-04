@@ -1,5 +1,3 @@
-
-
 from math import log
 from re import findall
 from typing import Optional
@@ -11,17 +9,15 @@ from .models import Document, Term
 
 
 def retrieve_words(file: UploadedFile) -> Optional[list[str]]:
-    words = []
-    line = file.readline()
-    while line:
-        words += findall(
-            r'[^\W0-9]+',
-            str(file.readline(), encoding='utf-8').lower()
-        )
-    return words
+    """Читает содержимое файла и находит все слова."""
+    return findall(
+        r'[^\W0-9]+',
+        str(file.read(), encoding='utf-8').lower()
+    )
 
 
 def count_number_of_each_word(words: list[str]) -> dict[str, int]:
+    """Считает, сколько раз каждое слово встречается в документе."""
     words_count = {}
     for word in words:
         if word not in words_count:
@@ -31,6 +27,7 @@ def count_number_of_each_word(words: list[str]) -> dict[str, int]:
 
 
 def set_document_terms(document: Document, text_words: list[str]):
+    """Обрабатывает список слов (без повторов) и обновляет записи в БД."""
     new_words = []
     existing_terms = []
     db_terms = Term.objects.in_bulk(field_name='spelling')
@@ -52,9 +49,15 @@ def count_tf_idf(
         total_words: int,
         words_count: dict[str, int]
 ) -> list[tuple[str, float, float]]:
-    terms = Term.objects.annotate(doc_count=Count('documents')).filter(
-        documents__id=document.pk
-    )
+    """
+    Формирует данные в виде списка кортежей,
+    в каждом из которых три элемента: (<слово>, <TF>, <IDF>).
+    Для подсчета IDF в качестве корпуса используются
+    все ранее обработанные файлы.
+    """
+    terms = Term.objects.annotate(
+        doc_count=Count('documents')
+    ).filter(documents__id=document.pk)
     total_documents = Document.objects.count()
     data = [
         (
@@ -64,4 +67,4 @@ def count_tf_idf(
         ) for term in terms
     ]
     data.sort(key=lambda x: x[2], reverse=True)
-    return data[:50]
+    return data
