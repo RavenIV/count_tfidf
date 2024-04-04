@@ -66,5 +66,5 @@ def count_tf_idf(
             log(total_documents / term.doc_count)
         ) for term in terms
     ]
-    data.sort(key=lambda x: x[2], reverse=True)
+    data.sort(key=lambda tup: (-tup[2], -tup[1], tup[0]))
     return data
