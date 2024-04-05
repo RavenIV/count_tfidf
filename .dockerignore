@@ -1,0 +1,5 @@
+venv
+infra
+.git
+.env
+db.sqlite3

@@ -17,7 +17,7 @@ TF и IDF рассчитываются только для текстовых ф
 - django-bootstrap5
 - SQLite
 
-## Запустить проект
+## Запустить проект локально
 
 Клонировать репозиторий и перейти в него в командной строке:
 
@@ -62,6 +62,33 @@ python manage.py migrate
 ```
 python manage.py runserver
 ```
+
+## Запустить проект в docker
+
+В директории infra/ заготовлен docker-compose для запуска проекта в контейнерах docker.
+
+```
+cd infra
+```
+
+Для использования PostgreSQL нужно заполнить .env по .env.example. Если не указать ```USE_POSTGRES```, будет использоваться SQLite.
+
+Для запуска проекта в режиме дебаггинга в .env указать: ```DEBUG=True```
+
+Выполнить команду:
+
+```
+docker compose up -d
+```
+
+Применить миграции:
+
+```
+docker compose exec django python manage.py migrate
+```
+
+Проект будет доступен на http://localhost:8000
+
 
 ## Разработчики
 

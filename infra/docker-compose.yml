@@ -1,0 +1,19 @@
+version: "3"
+
+volumes:
+  data:
+
+services:
+  postgres:
+    image: postgres:13.10
+    env_file: .env
+    volumes:
+      - data:/var/lib/postgresql/data
+  
+  django:
+    build: ../
+    env_file: .env
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"

@@ -64,12 +64,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'tf_idf.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if getenv('USE_POSTGRES'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': getenv('POSTGRES_DB', 'tfidf'),
+            'USER': getenv('POSTGRES_USER', 'tfidf'),
+            'PASSWORD': getenv('POSTGRES_PASSWORD', ''),
+            'HOST': getenv('DB_HOST', ''),
+            'PORT': getenv('DB_PORT', 5432)
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
