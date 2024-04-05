@@ -62,8 +62,8 @@ def count_tf_idf(
     data = [
         (
             term.spelling,
-            words_count[term.spelling] / total_words,
-            log(total_documents / term.doc_count)
+            round(words_count[term.spelling] / total_words, 4),
+            round(log(total_documents / term.doc_count), 4)
         ) for term in terms
     ]
     data.sort(key=lambda tup: (-tup[2], -tup[1], tup[0]))
